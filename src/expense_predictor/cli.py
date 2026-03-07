@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 from .analyzer import load_data, compute_monthly_totals, detect_large_transactions
 from .predictor import predict_next
+from .transactions import list_transactions, add_transaction, delete_transaction, update_transaction
 
 
 def main():
@@ -36,3 +37,23 @@ def main():
         plt.xticks(rotation=45)
         plt.show()
         sys.exit(1)
+    elif command == "list":
+        list_transactions(filepath)
+
+    elif command == "add":
+        date = sys.argv[3]
+        category = sys.argv[4]
+        amount = float(sys.argv[5])
+        add_transaction(filepath, date,category, amount)
+
+    elif command == "delete":
+        idx = int(sys.argv[3])
+        delete_transaction(filepath, idx)
+
+    elif command == "update":
+        idx = int(sys.argv[3])
+        amount = float(sys.argv[4])
+        update_transaction(filepath, idx, amount)
+
+    else:
+        print("Unknown command")

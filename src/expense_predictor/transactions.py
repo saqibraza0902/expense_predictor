@@ -1,9 +1,9 @@
 import pandas as pd
 
 
-def add_transaction(filepath, date, amount):
+def add_transaction(filepath, date,category, amount):
     df = pd.read_csv(filepath) # type: ignore
-    new_row = {"date": date, "amount": amount}
+    new_row = {"date": date,"category":category, "amount": amount}
     df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
     df.to_csv(filepath, index=False)
 
