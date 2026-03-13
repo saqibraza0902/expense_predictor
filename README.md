@@ -2,17 +2,21 @@
 
 ## Overview
 
-This project is a Python package that analyzes personal spending data and predicts future expenses using machine learning techniques. The goal is to help users understand their spending patterns and estimate upcoming expenses.
+Expense Predictor is a Python package that analyzes personal spending data and predicts future expenses using machine learning.
+It helps users understand their spending habits, manage transactions, and receive recommendations based on spending trends.
 
 ## Features
 
-* Load and process expense dataset from CSV
-* Clean and prepare financial data
-* Perform exploratory data analysis
-* Train a machine learning model to predict expenses
-* Generate predictions based on historical spending
+* Load expense data from a CSV file
+* Automatic transaction ID generation
+* Data cleaning and preprocessing
+* Exploratory analysis of spending patterns
+* Machine learning model to predict future expenses
+* Generate predictions from historical spending data
+* Textual recommendations based on spending trends
+* CRUD operations for managing transactions (Create, Read, Update, Delete)
 * Modular Python package structure
-* Jupyter Notebook for running and testing the project
+* Jupyter notebooks for experimentation and testing
 
 ## Project Structure
 
@@ -20,18 +24,21 @@ This project is a Python package that analyzes personal spending data and predic
 expense-predictor/
 │
 ├── data/
-│   └── expenses.csv
+│   └── transactions.csv
 │
 ├── src/
 │   └── expense_predictor/
 │       ├── __init__.py
-│       ├── data_loader.py
-│       ├── preprocessing.py
-│       ├── model.py
-│       └── predictor.py
+│       ├── __main__.py
+│       ├── analyzer.py
+│       ├── cli.py
+│       ├── predictor.py
+│       ├── recommendations.py
+│       └── transactions.py
 │
 ├── notebooks/
-│   └── experiment.ipynb
+│   ├── analysis.ipynb
+│   └── transactions.ipynb
 │
 ├── main.py
 ├── pyproject.toml
@@ -45,18 +52,64 @@ expense-predictor/
 * scikit-learn
 * matplotlib
 * jupyter
+* uv
 
-## How to Run
+## Installation
 
-1. git clone 
-2. cd expense-predictor
-3. uv pip install -e .
-4. uv run -m expense_predictor "command_type" data/transactions.csv
+Clone the repository and install the package.
+
+```
+git clone <repository-url>
+cd expense-predictor
+uv pip install -e .
+```
+
+## Running the Project (Command Line)
+
+Run the expense prediction:
+
+```
+uv run -m expense_predictor predict data/transactions.csv
+```
+
+Analyze the dataset:
+
+```
+uv run -m expense_predictor analyze data/transactions.csv
+```
+
+Generate spending recommendations:
+
+```
+uv run -m expense_predictor recommendations data/transactions.csv
+```
+
+## Running with Python
 
 ```
 python main.py
 ```
 
+## Running Jupyter Notebooks
+
+Start Jupyter:
+
+```
+jupyter notebook
+```
+
+Open one of the notebooks:
+
+```
+notebooks/analysis.ipynb
+```
+
+or
+
+```
+notebooks/transactions.ipynb
+```
+
 ## Purpose
 
-This project demonstrates how Python can be used to build a small data analysis and prediction system using real-world expense data.
+This project demonstrates how Python can be used to build a small financial analysis system that includes data processing, machine learning prediction, transaction management, and spending recommendations.
