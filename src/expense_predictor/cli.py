@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 from .analyzer import load_data, compute_monthly_totals, detect_large_transactions
 from .predictor import predict_next
+from .recommendations import generate_recommendations
 from .transactions import list_transactions, add_transaction, delete_transaction, update_transaction
 
 
@@ -54,6 +55,12 @@ def main():
         idx = int(sys.argv[3])
         amount = float(sys.argv[4])
         update_transaction(filepath, idx, amount)
+    elif command == "recommendations":
+        df = load_data(filepath)
+        recs = generate_recommendations(df)
+
+        for r in recs:
+            print("-", r)
 
     else:
         print("Unknown command")
