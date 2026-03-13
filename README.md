@@ -11,7 +11,6 @@ It helps users understand their spending habits, manage transactions, and receiv
 * Automatic transaction ID generation
 * Data cleaning and preprocessing
 * Exploratory analysis of spending patterns
-* Machine learning model to predict future expenses
 * Generate predictions from historical spending data
 * Textual recommendations based on spending trends
 * CRUD operations for managing transactions (Create, Read, Update, Delete)
