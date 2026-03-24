@@ -1,56 +1,100 @@
 import pandas as pd
-
+from .helpers import _clean_dates, _clean_amounts, _clean_categories, _clean_transaction_ids
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
 
 def load_data(filepath: str) -> pd.DataFrame:
-    df = pd.read_csv(filepath)  # type: ignore
+    """
+    Load a transactions CSV and apply full cleaning:
+      - Robust multi-format date parsing
+      - Amount coercion (strips symbols, removes negatives & junk strings)
+      - Category normalisation (case, typos, synonyms)
+      - Transaction ID gap-filling
+    """
+    print(f"\n{'='*60}")
+    print(f"Loading: {filepath}")
+    print(f"{'='*60}")
 
-    # Try to parse dates with mixed formats
-    df["date"] = pd.to_datetime(df["date"], dayfirst=False, errors='coerce')
+    df = pd.read_csv(filepath, dtype=str)   # read everything as str first
+    print(f"  Rows loaded: {len(df)}")
 
-    # For dates that couldn't be parsed, try with day first=True
-    mask = df["date"].isna()
-    if mask.any():
-        df.loc[mask, "date"] = pd.to_datetime(df.loc[mask, "date"], dayfirst=True, errors='coerce')
-
-    # Clean the amount column
-    if 'amount' in df.columns:
-        # Convert to string first
-        df['amount'] = df['amount'].astype(str)
-
-        # Remove any non-numeric characters EXCEPT decimal point (remove minus sign too)
-        df['amount'] = df['amount'].str.replace(r'[^\d.]', '', regex=True)
-
-        # Handle empty strings
-        df['amount'] = df['amount'].replace('', '0')
-
-        # Convert to float
-        df['amount'] = pd.to_numeric(df['amount'], errors='coerce')
-
-        print(f"Amount column cleaned. Range: {df['amount'].min()} to {df['amount'].max()}")
-        print(f"Sample amounts: {df['amount'].head().tolist()}")
+    # --- dates ---
+    if "date" in df.columns:
+        print("\n[date]")
+        df["date"] = _clean_dates(df["date"])
     else:
-        print("Warning: No 'amount' column found. Available columns:", df.columns.tolist())
+        print("  ⚠  No 'date' column found.")
 
-    print(df.head())
-    df = df.sort_values("date")
+    # --- amounts ---
+    if "amount" in df.columns:
+        print("\n[amount]")
+        df["amount"] = _clean_amounts(df["amount"])
+    else:
+        print("  ⚠  No 'amount' column found.")
 
+    # --- categories ---
+    if "category" in df.columns:
+        print("\n[category]")
+        df["category"] = _clean_categories(df["category"])
+        print(f"  ✔  Unique categories after normalisation: {len(df['category'].unique())}")
+    else:
+        print("  ⚠  No 'category' column found.")
+
+    # --- transaction IDs ---
+    if "transaction_id" in df.columns:
+        print("\n[transaction_id]")
+        df["transaction_id"] = _clean_transaction_ids(df["transaction_id"], len(df))
+
+    # --- sort by date ---
+    df = df.sort_values("date").reset_index(drop=True)
+
+    print(f"\n  ✔  Final shape: {df.shape}")
+    print(df.head(3).to_string())
     return df
 
 
 def compute_monthly_totals(df: pd.DataFrame) -> pd.Series:
+    """
+    Sum transaction amounts by calendar month.
+    Drops rows where date or amount is NaT/NaN before aggregating.
+    """
+    clean = df.dropna(subset=["date", "amount"]).copy()
+    clean["date"] = pd.to_datetime(clean["date"], utc=True)
+
     monthly = (
-        df.resample("ME", on="date")["amount"]
+        clean
+        .resample("ME", on="date")["amount"]
         .sum()
     )
     return monthly
 
 
-def detect_large_transactions(df: pd.DataFrame):
-    mean = df["amount"].mean()
-    std = df["amount"].std()
+def detect_large_transactions(df: pd.DataFrame, z_score_threshold: float = 2.0) -> pd.DataFrame:
+    """
+    Flag transactions whose amount is more than `z_score_threshold` standard
+    deviations above the mean.
 
-    threshold = mean + 2 * std
+    Returns a DataFrame with an extra 'z_score' column so callers can see
+    how extreme each flagged transaction is.
+    Skips rows with NaN amounts to avoid skewing the statistics.
+    """
+    clean = df.dropna(subset=["amount"]).copy()
 
-    unusual = df[df["amount"] > threshold]
+    mean = clean["amount"].mean()
+    std  = clean["amount"].std()
 
-    return unusual
+    if std == 0:
+        print("  ⚠  Standard deviation is 0 — all amounts are identical.")
+        return clean.iloc[0:0]   # empty frame with correct columns
+
+    threshold = mean + z_score_threshold * std
+
+    clean["z_score"] = ((clean["amount"] - mean) / std).round(2)
+    unusual = clean[clean["amount"] > threshold].copy()
+
+    print(f"\n[detect_large_transactions]")
+    print(f"  Mean: {mean:.2f} | Std: {std:.2f} | Threshold (z>{z_score_threshold}): {threshold:.2f}")
+    print(f"  {len(unusual)} large transaction(s) detected out of {len(clean)} valid rows.")
+
+    return unusual.sort_values("amount", ascending=False).reset_index(drop=True)
