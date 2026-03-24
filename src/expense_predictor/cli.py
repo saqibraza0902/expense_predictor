@@ -5,7 +5,7 @@ from .analyzer import load_data, compute_monthly_totals, detect_large_transactio
 from .predictor import predict_next
 from .recommendations import generate_recommendations
 from .transactions import list_transactions, add_transaction, delete_transaction, update_transaction
-
+from .visualizer import (plot_moving_average,plot_category_breakdown,plot_monthly_trend)
 
 def main():
     command = sys.argv[1]
@@ -61,6 +61,9 @@ def main():
 
         for r in recs:
             print("-", r)
-
+    elif command == "visualize":
+        plot_moving_average(filepath)
+        plot_category_breakdown(filepath)
+        plot_monthly_trend(filepath)
     else:
         print("Unknown command")
