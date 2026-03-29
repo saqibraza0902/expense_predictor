@@ -121,6 +121,9 @@ uv pip install -e .
 
 # 3. Verify installation
 uv run -m expense_predictor
+
+# 3. Run jupyter notebook
+uv run --with jupyter jupyter lab
 ```
 
 **Alternative installation with pip:**
@@ -184,16 +187,7 @@ for rec in recommendations:
     print(f"💡 {rec}")
 ```
 
-### Running Jupyter Notebooks
 
-```bash
-# Start Jupyter server
-jupyter notebook
-
-# Navigate to and open:
-notebooks/analysis.ipynb      # Comprehensive data analysis
-notebooks/transactions.ipynb  # Transaction management demo
-```
 
 ---
 
@@ -206,7 +200,7 @@ Your CSV file should follow this structure:
 | `date` | string | ✅ Yes | Transaction date (any common format) | `2024-01-15`, `15/01/2024`, `Jan 15, 2024` |
 | `amount` | number | ✅ Yes | Transaction amount (positive numbers) | `45.50`, `$89.99`, `-120.00` (negatives become NaN) |
 | `category` | string | ✅ Yes | Spending category (auto-normalized) | `Restaurant`, `Market`, `Transport` |
-| `transaction_id` | number | ❌ No | Unique identifier (auto-generated if missing) | `1`, `2`, `3` |
+
 
 ### Supported Date Formats
 The parser handles 15+ formats automatically, including:
@@ -297,8 +291,6 @@ is_anomaly = z_score > threshold  # Default: 2.0 standard deviations
 1. **Dates:** 15+ formats → Pandas datetime (UTC normalized)
 2. **Amounts:** Currency symbols removed → Float conversion → Negative values dropped
 3. **Categories:** Lowercase → Synonym mapping → Title case normalization
-4. **IDs:** Integer conversion → Missing values auto-filled with sequential IDs
-
 ---
 
 ## 📦 Dependencies
