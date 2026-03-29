@@ -1,14 +1,14 @@
 [project]
 name = "expense_predictor"
-version = "0.1.0"
+version = "1.0.0"
 description = "CLI tool to analyze monthly expenses and predict next month's spending."
-authors = [{name = "Your Name"}]
-requires-python = ">=3.14"
+authors = [{name = "Saqib Raza"}]
+requires-python = ">=3.10"
 dependencies = [
     "pandas",
     "matplotlib",
     "numpy",
-    "ipykernel>=7.2.0",
+    "jupyter",
 ]
 
 [project.scripts]

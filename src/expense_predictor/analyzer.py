@@ -12,9 +12,7 @@ def load_data(filepath: str) -> pd.DataFrame:
       - Category normalisation (case, typos, synonyms)
       - Transaction ID gap-filling
     """
-    print(f"\n{'='*60}")
-    print(f"Loading: {filepath}")
-    print(f"{'='*60}")
+
 
     df = pd.read_csv(filepath, dtype=str)   # read everything as str first
     print(f"  Rows loaded: {len(df)}")
@@ -49,7 +47,7 @@ def load_data(filepath: str) -> pd.DataFrame:
     # --- sort by date ---
     df = df.sort_values("date").reset_index(drop=True)
 
-    print(f"\n  ✔  Final shape: {df.shape}")
+    # print(f"\n  ✔  Final shape: {df.shape}")
     print(df.head(3).to_string())
     return df
 
